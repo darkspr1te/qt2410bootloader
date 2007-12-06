@@ -8,6 +8,7 @@ extern void StartMMU(unsigned int mmu_base);
 extern void PortInit(void);
 extern void InitIRQDevices(void);
 extern void setupIRQEnv(void);
+extern void Test_Adc(void);
 
 int main(void)
 {
@@ -20,6 +21,7 @@ int main(void)
  	setupIRQEnv();
  	InitIRQDevices();		  		
  	printf("Joey Software-Reset bootloader Test\n\r");
+ 	Test_Adc();
  	while (1)
   	{
  		scanf("%c",&ch);
