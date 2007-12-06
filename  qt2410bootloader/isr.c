@@ -71,7 +71,7 @@ void setupIRQEnv()
   	setIRQHandler(UART0_INT, UARTIrq); 
   	 //enable IRQ
   	enable_IRQ();
-    //enable timer0 interrupt
+    //enable device interrupt
   	Enable_Int(nTIMER0_INT);
   	Enable_Int(UART0_INT);
 }

@@ -538,3 +538,15 @@
 #define BIT_SUB_TXD0   (0x1<<1)
 #define BIT_SUB_RXD0   (0x1<<0)
 
+
+//keycode definition
+#define	ENTER_KEY	0x0d
+#define	BACK_KEY	0x08
+#define BEEP_KEY	0x07
+#define UP_KEY		0x41
+#define DOWN_KEY	0x42
+#define RIGHT_KEY	0x43
+#define LEFT_KEY	0x44
+#define HOME_KEY	0x48
+#define END_KEY		0x4b
+#define	ESC_KEY		0x1b
