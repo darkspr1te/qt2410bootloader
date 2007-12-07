@@ -21,7 +21,8 @@ int main(void)
  	setupIRQEnv();
  	InitIRQDevices();		  		
  	printf("Joey Software-Reset bootloader Test\n\r");
- 	Test_Adc();
+ 	//Test_Adc();
+ 	Test_DMA();
  	while (1)
   	{
  		scanf("%c",&ch);
