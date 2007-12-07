@@ -6,6 +6,10 @@ typedef void (*voidfun)();
 extern void Timer0_ISR(void);
 extern void UARTIrq(void);
 extern void UART0_Init(void);
+extern void Dma0Done(void);
+extern void Dma1Done(void);
+extern void Dma2Done(void);
+extern void Dma3Done(void);
 // 宣告中斷向量表格
 voidfun (IntHandlerTable)[IRQ_INT_NO] ;
 
@@ -69,11 +73,19 @@ void setupIRQEnv()
     //register interrupt
   	setIRQHandler(nTIMER0_INT, Timer0_ISR); 
   	setIRQHandler(UART0_INT, UARTIrq); 
+  	setIRQHandler(nDMA0_INT, Dma0Done);
+  	setIRQHandler(nDMA1_INT, Dma1Done);
+  	setIRQHandler(nDMA2_INT, Dma2Done);
+  	setIRQHandler(nDMA3_INT, Dma3Done);
   	 //enable IRQ
   	enable_IRQ();
     //enable device interrupt
   	Enable_Int(nTIMER0_INT);
   	Enable_Int(UART0_INT);
+  	Enable_Int(nDMA0_INT);
+  	Enable_Int(nDMA1_INT);
+  	Enable_Int(nDMA2_INT);
+  	Enable_Int(nDMA3_INT);
 }
 
 
