@@ -5,6 +5,7 @@ void mmu_tlb_init()
 {
 	unsigned long entry_index;
 	 
+	
 	/*SRAM*/
 	/*for (sectionNumber = 0; sectionNumber < 4096; sectionNumber++) {
 		pageoffset = (sectionNumber << 20);
