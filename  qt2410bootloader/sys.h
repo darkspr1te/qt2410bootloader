@@ -8,6 +8,9 @@
 #define MMU_SECTION		(2) /* indicates that this is a section descriptor */
 #define MMU_SECDESC		(MMU_FULL_ACCESS | MMU_DOMAIN | MMU_SPECIAL | MMU_SECTION)
 
+#define u_char unsigned char 
+#define u_int unsigned int
+#define u_short unsigned short
 
 //QT2410 registers
 // Memory control 
@@ -114,14 +117,14 @@
 
 // NAND flash
 #define rNFCONF     (*(volatile unsigned *)0x4e000000)      //NAND Flash configuration
-#define rNFCMD      (*(volatile U8 *)0x4e000004)            //NADD Flash command
-#define rNFADDR     (*(volatile U8 *)0x4e000008)            //NAND Flash address
-#define rNFDATA     (*(volatile U8 *)0x4e00000c)            //NAND Flash data
+#define rNFCMD      (*(volatile u_char *)0x4e000004)            //NADD Flash command
+#define rNFADDR     (*(volatile u_char *)0x4e000008)            //NAND Flash address
+#define rNFDATA     (*(volatile u_char *)0x4e00000c)            //NAND Flash data
 #define rNFSTAT     (*(volatile unsigned *)0x4e000010)      //NAND Flash operation status
 #define rNFECC      (*(volatile unsigned *)0x4e000014)      //NAND Flash ECC
-#define rNFECC0     (*(volatile U8  *)0x4e000014)
-#define rNFECC1     (*(volatile U8  *)0x4e000015)
-#define rNFECC2     (*(volatile U8  *)0x4e000016)
+#define rNFECC0     (*(volatile u_char  *)0x4e000014)
+#define rNFECC1     (*(volatile u_char  *)0x4e000015)
+#define rNFECC2     (*(volatile u_char  *)0x4e000016)
 
 // UART
 #define rULCON0     (*(volatile unsigned *)0x50000000) //UART 0 Line control
@@ -550,3 +553,28 @@
 #define HOME_KEY	0x48
 #define END_KEY		0x4b
 #define	ESC_KEY		0x1b
+
+//mem size
+#define	SIZE_1K		0x00000400
+#define	SIZE_2K		0x00000800
+#define	SIZE_4K		0x00001000
+#define	SIZE_8K		0x00002000
+#define	SIZE_16K	0x00004000
+#define	SIZE_32K	0x00008000
+#define	SIZE_64K	0x00010000
+#define	SIZE_128K	0x00020000
+#define	SIZE_256K	0x00040000
+#define	SIZE_512K	0x00080000
+#define	SIZE_1M		0x00100000
+#define	SIZE_2M		0x00200000
+#define	SIZE_4M		0x00400000
+#define	SIZE_8M		0x00800000
+#define	SIZE_16M	0x01000000
+#define	SIZE_32M	0x02000000
+#define	SIZE_64M	0x04000000
+#define	SIZE_128M	0x08000000
+#define	SIZE_256M	0x10000000
+#define	SIZE_512M	0x20000000
+#define	SIZE_1G		0x40000000
+#define	SIZE_2G		0x80000000
+

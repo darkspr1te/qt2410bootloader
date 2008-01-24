@@ -22,7 +22,10 @@ int main(void)
  	InitIRQDevices();		  		
  	printf("Joey Software-Reset bootloader Test\n\r");
  	//Test_Adc();
- 	Test_DMA();
+ 	//Test_DMA();
+ 	//NAND FLASH TEST
+ 	NandFlashInit();	
+	NANDFlashTest();
  	while (1)
   	{
  		scanf("%c",&ch);
