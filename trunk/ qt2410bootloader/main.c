@@ -24,11 +24,17 @@ int main(void)
  	//Test_Adc();
  	//Test_DMA();
  	//NAND FLASH TEST
- 	NandFlashInit();	
-	NANDFlashTest();
+ 	//NandFlashInit();	
+	//NANDFlashTest();
+	IICInit();
+	TestIIC();
+	//printf("Watchdog test....System will reboot after 5 seconds\n\r");
+	//WDInit();
  	while (1)
   	{
  		scanf("%c",&ch);
  		printf("%c",ch);
+ 		
+		//Delay(1000);
   	}
 }

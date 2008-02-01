@@ -1,9 +1,13 @@
 #include "sys.h"
+//#define WDTest
+
 extern void led_on();
 extern void led_off();
 
 unsigned int dispaly0=1;
-
+#ifdef WDTest
+unsigned int WDtest=0;
+#endif
 void Init_Timer()
 {
 	rTCFG0|=249; //Prescaler0 = 249=>50000000/16/(249+1)=12500
@@ -23,4 +27,13 @@ void Timer0_ISR(void)
         led_off(); 
 
     dispaly0++; 
+    
+    #ifdef WDTest
+    if (WDtest<5)
+    {
+    	rWTCNT = 0x1000;
+    }
+    WDtest++;
+    printf("1 sec tick\n\r");
+    #endif
 }

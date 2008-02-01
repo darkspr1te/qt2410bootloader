@@ -12,6 +12,10 @@
 #define u_int unsigned int
 #define u_short unsigned short
 
+#define bool int
+#define true 1
+#define false 0
+
 //QT2410 registers
 // Memory control 
 #define rBWSCON    (*(volatile unsigned *)0x48000000) //Bus width & wait status
