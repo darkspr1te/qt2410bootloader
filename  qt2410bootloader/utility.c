@@ -1,34 +1,18 @@
 #include "sys.h"
+//delay for 1 milli second = 0.001 sec
 void Delay(unsigned int ms)
 {
-	
-	/*if you want to sample adc data for 1 seconds,please uncomment 
-	//rTCFG0|=0xF900;
-	//rTCNTB4=12500;
-	*/
-	/*use timer4 to generate delay interval as unit ms*/
-	rTCFG0|=0x400; //Prescaler1 = 4
-	//rTCFG0|=0xF900;
-	rTCFG1|=0x30000; //Select MUX input for PWM Timer4:divider=16
-	rTCNTB4=3125;
-	//rTCNTB4=12500;
-	rTCON|=(1<<21);//timer4 manual update
-	rTCON&=~(1<<21);//timer4 manual updata off
-	rTCON|=(1<<20);//auto reload off
-	while(ms--) {
-		while(rTCNTO4>0);
+	rTCFG0|=0xFF00;  //Prescaler1=255
+	rTCFG1|=0x300; //Select MUX input for PWM Timer2:divider=16
+	// I just compute this value by using my watch timing
+	rTCNTB2=750; //50000000/16/(255+1)=81.92*10^-6 seconds
+	rTCMPB2=0;   //81.92*750=0.06 but actually it runs a 1 milli seconds interval
+	rTCON|=1<<13;//timer2 manual updata on
+	rTCON&=~(1<<13);//timer2 manual updata off
+	rTCON|=0x9<<12;//start timer2 with auto reload on and invert off
+	while(ms!=0) {
+		while(rTCNTO2>0);
+		--ms;
 	}
-	rTCON&=~(1<<20);
-	
-	/*use timer0 to generate delay interval as unit ms*/
-	/*rTCFG0=0x4; //Prescaler0 = 4
-	rTCFG1=0x3; //Select MUX input for PWM Timer0:divider=16
-	rTCNTB0=3125;
-	rTCON|=(1<<1);//reload timer0 buffer;
-	rTCON&=~(1<<1);//reload timer0 buffer;
-	rTCON|=0x1;
-	while(ms--) {
-		while(rTCNTO0>0);
-	}
-	rTCON&=~(0x1);*/
+	rTCON&=~(0x9<<20);
 } 
