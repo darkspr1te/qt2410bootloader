@@ -18,7 +18,12 @@ void mmu_tlb_init()
  		/*section table's entry:AP=0b11,domain=0,Cached,write-through mode(WT)*/
  		*(mmu_tlb_base+(entry_index>>20))=entry_index|(0x03<<10)|(0<<5)|(1<<4)| 0x02;
  	}
-	
+	//for NGCS3 ethernet
+	for(entry_index = 0x18000000; entry_index < 0x20000000;entry_index += 0x100000)
+ 	{
+ 		/*section table's entry:AP=0b11,domain=0,NCNB*/	
+ 		*(mmu_tlb_base+(entry_index>>20)) =entry_index |(0x03<<10)|(0<<5)|(1<<4)| 0x02;
+ 	} 
 	
 	
      /*SDRAM*/

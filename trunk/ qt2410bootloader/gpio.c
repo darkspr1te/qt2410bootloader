@@ -68,7 +68,7 @@ void PortInit(void)
     //Signal : KBDSPIMISO LCD_PWREN EINT11 nSS_SPI IRQ_LAN IRQ_PCMCIA
     //Setting:  SPIMISO1  LCD_PWRDN Input   Input   Input    Input
     //Binary :     11         11   ,  00      00  ,  00        00
-    rGPGCON = 0xff001318;	//GPG0,1,3 input, GPG2,6 output GPG5,7,8,9,10,11 input
+    rGPGCON = 0xff00131a;	//GPG0,1,3 input, GPG2,6 output GPG5,7,8,9,10,11 input
     rGPGUP  = 0xffff;	// The pull up function is disabled GPG[15:0]
 		rGPGDAT = 0;	//GPG2,6 output0
 

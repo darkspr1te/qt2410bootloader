@@ -24,13 +24,15 @@
 #define INTOFFSET_REG REG32(INTOFFSET)    //Interruot request source offset
 #define SUBSRCPND_REG REG32(SUBSRCPND)    //Sub source pending
 #define INTSUBMSK_REG REG32(INTSUBMSK)    //Interrupt sub mask
-
+#define rEINTMASK  (*(volatile unsigned *)0x560000a4) //External interrupt mask
 
 #define	Enable_Int(n)           INTMSK_REG &= ~(1<<(n))
 #define	Disable_Int(n)			INTMSK_REG |= (1<<(n))
 #define Clear_SRCPendingBit(n)     SRCPND_REG = (1<<(n))
 #define Clear_INTPendingBit(n)     INTPND_REG = (1<<(n))
-
+#define Enable_EInt(n)          rEINTMASK&=~(1<<(n)) 
+#define Disable_EInt            rEINTMASK=0xffffff
+#define Clear_EIntPendingBit(n) rEINTPEND=(1<<(n))
 // 中斷向量最大值
 #define	IRQ_INT_NO	32
 
@@ -67,6 +69,9 @@
 #define	nSPI1_INT		29
 #define	nRTC_INT		30
 #define	nADC_INT		31
+
+//external int definitions
+#define IRQ_LAN 9
 
 __inline void enable_IRQ(void)
 {

@@ -14,22 +14,27 @@ int main(void)
 {
  	char ch;
  	
+ 	
  	PortInit();
  	CleanMMUTable();
  	mmu_tlb_init();
  	StartMMU(MMU_TABLE_BASE);
  	setupIRQEnv();
- 	InitIRQDevices();		  		
+ 	InitIRQDevices();	
  	printf("Joey Software-Reset bootloader Test\n\r");
  	//Test_Adc();
  	//Test_DMA();
  	//NAND FLASH TEST
  	//NandFlashInit();	
 	//NANDFlashTest();
-	IICInit();
-	TestIIC();
+	//IICInit();
+	//TestIIC();
 	//printf("Watchdog test....System will reboot after 5 seconds\n\r");
 	//WDInit();
+	//ethernet test
+ 	InitEthernet();
+ 	TestTransmitPacket();
+ 	
  	while (1)
   	{
  		scanf("%c",&ch);

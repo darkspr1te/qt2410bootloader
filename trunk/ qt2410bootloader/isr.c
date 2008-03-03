@@ -1,4 +1,5 @@
 #include "isr.h"
+#include "sys.h"
 #define NULL 0
 typedef void (*voidfun)();
 
@@ -11,7 +12,7 @@ extern void Dma1Done(void);
 extern void Dma2Done(void);
 extern void Dma3Done(void);
 extern void IICInt(void);
-
+extern void  RxPacketStatus();
 
 // い耞秖
 voidfun (IntHandlerTable)[IRQ_INT_NO] ;
@@ -21,6 +22,8 @@ void ClrIntStatus(void)
 {
     INTMSK_REG = 0xffffffff;  // 埃办い耞ㄓ方ぇ闽超┮Τい耞ㄓ方
     INTPND_REG = 0xffffffff;  // 睲埃┮Τ单じ
+    rEINTMASK=0xffffff;
+    rEINTPEND = 0xffffff;
 }
 // ﹍てい耞秖
 void creatIntHandlerTable(void)
@@ -51,9 +54,12 @@ void ISR_IRQ(void)
     {
         if (IntHandlerTable[currentIRQnumber] != NULL)
         {
+             
              Clear_SRCPendingBit(currentIRQnumber);
-		     Clear_INTPendingBit(currentIRQnumber);           
-             IntHandlerTable[currentIRQnumber](); 
+		     Clear_INTPendingBit(currentIRQnumber);
+		     IntHandlerTable[currentIRQnumber](); 
+		     //Clear_EIntPendingBit(IRQ_LAN);          
+              
         }
     }
      
@@ -66,6 +72,19 @@ void InitIRQDevices()
   	//initial uart
   	UART0_Init();
   	
+  	
+}
+
+void ExternIntDevice()
+{
+	//printf("EINT %2x\n\r",rEINTPEND);
+	if (rEINTPEND==(1<<IRQ_LAN)) 
+	{
+		RxPacketStatus();
+		Clear_EIntPendingBit(IRQ_LAN);
+	}
+	else Clear_EIntPendingBit(IRQ_LAN);
+	
 }
 
 void setupIRQEnv()
@@ -82,12 +101,14 @@ void setupIRQEnv()
   	setIRQHandler(nDMA2_INT, Dma2Done);
   	setIRQHandler(nDMA3_INT, Dma3Done);
   	setIRQHandler(nIIC_INT, IICInt);
+  	setIRQHandler(nEXT8_23_INT,ExternIntDevice);
   	
   	
   	
   	 //enable IRQ
   	enable_IRQ();
     //enable device interrupt
+    Enable_EInt(IRQ_LAN);
   	Enable_Int(nTIMER0_INT);
   	Enable_Int(UART0_INT);
   	Enable_Int(nDMA0_INT);
@@ -95,6 +116,8 @@ void setupIRQEnv()
   	Enable_Int(nDMA2_INT);
   	Enable_Int(nDMA3_INT);
   	Enable_Int(nIIC_INT);
+  	Enable_Int(nEXT8_23_INT);
+  	
   	
   	
 }
