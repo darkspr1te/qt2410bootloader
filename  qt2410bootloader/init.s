@@ -13,7 +13,7 @@ UBLB		EQU	(0x1<<3)
 ;BUSWIDTH=32
 B1_BWSCON	EQU (DW32)
 B2_BWSCON	EQU (DW16)
-B3_BWSCON	EQU (DW16)
+B3_BWSCON	EQU (DW16+WAIT+UBLB)
 B4_BWSCON	EQU (DW16)
 B5_BWSCON	EQU (DW16)
 B6_BWSCON	EQU (DW32)
@@ -48,9 +48,9 @@ B2_PMC		EQU	0x0	;normal
 
 ;Bank 3 parameter
 B3_Tacs		EQU	0x0	;0clk
-B3_Tcos		EQU	0x0	;0clk
+B3_Tcos		EQU	0x1	;0clk
 B3_Tacc		EQU	0x7	;14clk
-B3_Tcoh		EQU	0x0	;0clk
+B3_Tcoh		EQU	0x1	;0clk
 B3_Tah		EQU	0x0	;0clk
 B3_Tacp		EQU	0x0	
 B3_PMC		EQU	0x0	;normal
