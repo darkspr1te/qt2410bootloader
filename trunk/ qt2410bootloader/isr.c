@@ -13,6 +13,8 @@ extern void Dma2Done(void);
 extern void Dma3Done(void);
 extern void IICInt(void);
 extern void  RxPacketStatus();
+extern void usbIRQ();
+
 
 // 宣告中斷向量表格
 voidfun (IntHandlerTable)[IRQ_INT_NO] ;
@@ -102,6 +104,7 @@ void setupIRQEnv()
   	setIRQHandler(nDMA3_INT, Dma3Done);
   	setIRQHandler(nIIC_INT, IICInt);
   	setIRQHandler(nEXT8_23_INT,ExternIntDevice);
+  	setIRQHandler(nUSBD_INT,usbIRQ);
   	
   	
   	
@@ -117,9 +120,7 @@ void setupIRQEnv()
   	Enable_Int(nDMA3_INT);
   	Enable_Int(nIIC_INT);
   	Enable_Int(nEXT8_23_INT);
-  	
-  	
-  	
+  	Enable_Int(nUSBD_INT);
 }
 
 
