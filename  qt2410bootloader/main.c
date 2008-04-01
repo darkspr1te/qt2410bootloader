@@ -32,9 +32,11 @@ int main(void)
 	//printf("Watchdog test....System will reboot after 5 seconds\n\r");
 	//WDInit();
 	//ethernet test
- 	InitEthernet();
- 	TestTransmitPacket();
- 	
+ 	//InitEthernet();
+ 	//TestTransmitPacket();
+ 	//usb test
+ 	usbInit();
+ 	usbTest();
  	while (1)
   	{
  		scanf("%c",&ch);
