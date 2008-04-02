@@ -35,8 +35,12 @@ int main(void)
  	//InitEthernet();
  	//TestTransmitPacket();
  	//usb test
- 	usbInit();
- 	usbTest();
+ 	//usbInit();
+ 	//usbTest();
+ 	//tftp test
+ 	eth_init();
+ 	StartTFTPServer(0,0);
+ 	
  	while (1)
   	{
  		scanf("%c",&ch);

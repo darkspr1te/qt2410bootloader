@@ -16,3 +16,26 @@ void Delay(unsigned int ms)
 	}
 	rTCON&=~(0x9<<20);
 } 
+
+unsigned short ntohs(unsigned short s)
+{
+	return (s >> 8) | (s << 8);
+}
+
+unsigned long ntohl(unsigned long l)
+{
+	return  ((l >> 24) & 0x000000ff) |
+		((l >>  8) & 0x0000ff00) |
+		((l <<  8) & 0x00ff0000) |
+		((l << 24) & 0xff000000);
+}
+
+unsigned short htons(unsigned short s)
+{
+	return (s >> 8) | (s << 8);
+}
+
+unsigned long htonl(unsigned long l)
+{
+	return ntohl(l);
+}
