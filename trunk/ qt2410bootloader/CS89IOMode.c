@@ -1,7 +1,14 @@
 #include "sys.h"
 #include "CS89IOMode.h"
-
-
+//add for skb support
+#include "skbuff.h"
+#include "eth.h"
+#include "arp.h"
+#include "ip.h"
+#include "udp.h"
+#include "utils.h"
+extern bool startTFTP;
+u_char CS8900Amac[6]={0x00,0x80,0x48,0x12,0x34,0x56};
 #define IOBASEAddr 0x19000300 //nGCS3:0x18000000 | 1<<24 to choose IO mode op and plus 300h for IO registers
 
 #define IOREAD(o)					((u_short)*((volatile u_short *)(IOBASEAddr + (o))))
@@ -106,10 +113,9 @@ void EnableCS8900AIRQ(void)
 bool InitControlReg()
 {
 	u_short temp;
-	u_char mac[6]={0x00,0x80,0x48,0x12,0x34,0x56};
 	u_short *MAC;
 	
-	MAC=(u_short *)mac;
+	MAC=(u_short *)CS8900Amac;
 	temp =ReadPktPageReg(PKTPG_LINE_CTL);
 	temp|= LINE_CTL_10_BASE_T;
 	temp|= LINE_CTL_MOD_BACKOFF;
@@ -140,7 +146,7 @@ void InitEthernet()
 	InitControlReg();
 }
 
-void TransmitPacket(char *buffer,u_short len)
+void TransmitPacket(u_char *buffer,u_short len)
 {
 	int event=0,i;
 	u_short data,*ptr;
@@ -170,7 +176,7 @@ void TransmitPacket(char *buffer,u_short len)
 		len-=2;
 		++ptr;
 	}
-	printf("Transmit packet success\n\r");
+	//printf("Transmit packet success\n\r");
 }
 
 int ReceivePacket(char *buffer)
@@ -201,40 +207,66 @@ int ReceivePacket(char *buffer)
 
 void RecvRoutine()
 {
-	char recv[1532];
+	//char recv[1532];
 	int i,len;
 	
-	len=ReceivePacket(recv);
+	/*len=ReceivePacket(recv);
 	printf("\n\r-===Recieve packet size:%d===-\n\r",len);
  	for (i=0;i<len;i++)
  	{
 		printf(" %2x", recv[i]);
 		if ((i>1)&&((i%16)==0)) printf("\n\r");  	
-	}	
+	}*///uncomment test code to see more detail about our packet
+	struct sk_buff *skb;
+	struct ethhdr *eth_hdr;		
+	
+	
+	
+	
+	skb = alloc_skb(ETH_FRAME_LEN);
+	len=ReceivePacket((char *)skb->data);
+	skb->len=len;
+	if (startTFTP==true)
+	{
+		eth_hdr = (struct ethhdr *)(skb->data);					
+		skb_pull(skb, ETH_HLEN);
+		if (ntohs(eth_hdr->h_proto) == ETH_P_ARP)
+			arp_rcv_packet(skb);
+		else if(ntohs(eth_hdr->h_proto) == ETH_P_IP)						
+		 	ip_rcv_packet(skb);	
+	}else free_skb(skb);
 }
 
 void  RxPacketStatus()
 {
 	u_short event;
 	
-	//event = IOREAD(ISQ);
-	while (event = IOREAD(ISQ))//read all the interrupt event,or we will never recv any interrupt from CS8900a
+	event = IOREAD(ISQ);
+	//while (event = IOREAD(ISQ))
+	do
 	{
-	if ( ((event & ISQ_REG_NUM   )    == REG_NUM_RX_EVENT ) &&
-	   ((event & RX_EVENT_RX_OK)    == RX_EVENT_RX_OK   ) &&
-	   ((event & RX_EVENT_IND_ADDR) | (event & RX_CTL_BROADCAST_A))) 
-		{
-			RecvRoutine();
-		}
+	
+		if ( ((event & ISQ_REG_NUM   )    == REG_NUM_RX_EVENT ) &&
+	   	((event & RX_EVENT_RX_OK)    == RX_EVENT_RX_OK   ) &&
+	   	((event & RX_EVENT_IND_ADDR) | (event & RX_CTL_BROADCAST_A))) 
+			{
+				RecvRoutine();
+			}
 		else printf("rx error\n\r");
-	}
+		event = IOREAD(ISQ);	
+	}while (event);//read all the interrupt event,or we will never recv any interrupt from CS8900a
 }
 
 void TestTransmitPacket()
 {
-	char buffer[512];
+	u_char buffer[512];
 	
 	memset(buffer,0xff,512);
 	TransmitPacket(buffer,512);
+}
+int board_eth_get_addr(unsigned char *addr)
+{
+	memcpy(addr, CS8900Amac, ETH_ALEN);
+	return 0;
 }
 
