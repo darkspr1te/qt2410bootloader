@@ -15,6 +15,9 @@
 #define bool int
 #define true 1
 #define false 0
+#define NULL 0
+#define SUCCESS 1
+#define FAIL 0
 
 //QT2410 registers
 // Memory control 
@@ -582,3 +585,28 @@
 #define	SIZE_1G		0x40000000
 #define	SIZE_2G		0x80000000
 
+//system information
+typedef struct _systemInfo
+{
+	char banner[12];
+	u_char MACAddr[6];
+	u_int IPAddr;
+	u_int bootImageStart;
+	u_int bootImageSize;
+	u_int LinuxKernelImageStart;
+	u_int LinuxKernelImageSize;
+	u_int LinuxFileSystemStart;
+	u_int LinuxFileSystemSize;
+	u_int OtherKernelImageStart;
+	u_int OtherKernelImageSize;
+	u_int ApplicationLoadAddress;
+	char BootParam[256];
+	u_int BootOption;
+}systemInfo;
+
+#define LinuxStart 1
+#define OtherStart 2
+
+#define LKIM 1
+#define LKFS 2
+#define OKIM 3

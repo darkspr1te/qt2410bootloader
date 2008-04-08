@@ -4,7 +4,7 @@
 #include "ip.h"
 #include "udp.h"
 #include "tftp.h"
-#include "utils.h"
+#include "utility.h"
 
 int udp_init(void)
 {

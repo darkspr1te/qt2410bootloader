@@ -4,10 +4,11 @@
 #include "arp.h"
 #include "ip.h"
 #include "udp.h"
-#include "utils.h"
+#include "utility.h"
 #include "sys.h"
 //#include "../../inc/board.h"
 
+extern systemInfo *globalSysInfo;
 
 bool startTFTP=false;
 char TftpLoadEnd;
@@ -21,13 +22,17 @@ char TftpPutMark;
 unsigned long tftp_download_len;
 unsigned long tftp_download_addr;
 
-int StartTFTPServer(u_int addr, u_int give_ip)
+
+
+int StartTFTPServer()
 {
 	unsigned char eth_addr[ETH_ALEN];	
 	unsigned char *s;
+	u_int give_ip;
 	
 	startTFTP=true;
-	give_ip = LOCAL_IP_ADDR;
+	//give_ip = LOCAL_IP_ADDR;
+	give_ip=ntohl(globalSysInfo->IPAddr);
 	s = (unsigned char *)&give_ip;
 	
 	printf("Mini TFTP Server 1.0 (IP : %d.%d.%d.%d PORT: %d)\n\r", s[3], s[2], s[1], s[0], TFTP);		
@@ -48,7 +53,7 @@ int StartTFTPServer(u_int addr, u_int give_ip)
 	TftpPutMark  = 0;
 	TftpPutBegin = 0;
 	
-	tftp_download_addr = 0x31008000;
+	tftp_download_addr =globalSysInfo->ApplicationLoadAddress;
 	tftp_download_len = 0;
 	
 	while (!TftpLoadEnd) 
@@ -66,9 +71,10 @@ int StartTFTPServer(u_int addr, u_int give_ip)
 	}
 
 	if(TftpLoadEnd) {
-		printf("download 0x%x bytes to 0x%08x\n\r", tftp_download_len, tftp_download_addr);
+		printf("\n\rdownload 0x%x bytes to 0x%08x\n\r", tftp_download_len, tftp_download_addr);
 //		printf("\nPress any key to continue...\n");
 //		getch();
+		startTFTP=false;
 		return tftp_download_len;
 	}
 	startTFTP=false;

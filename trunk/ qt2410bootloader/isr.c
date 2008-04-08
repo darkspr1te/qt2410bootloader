@@ -14,6 +14,7 @@ extern void Dma3Done(void);
 extern void IICInt(void);
 extern void  RxPacketStatus();
 extern void usbIRQ();
+extern void IsrForUSBDma2(void);
 
 
 // 宣告中斷向量表格
@@ -98,10 +99,10 @@ void setupIRQEnv()
     //register interrupt
   	setIRQHandler(nTIMER0_INT, Timer0_ISR); 
   	setIRQHandler(UART0_INT, UARTIrq); 
-  	setIRQHandler(nDMA0_INT, Dma0Done);
-  	setIRQHandler(nDMA1_INT, Dma1Done);
-  	setIRQHandler(nDMA2_INT, Dma2Done);
-  	setIRQHandler(nDMA3_INT, Dma3Done);
+  	//setIRQHandler(nDMA0_INT, Dma0Done);
+  	//setIRQHandler(nDMA1_INT, Dma1Done);
+  	setIRQHandler(nDMA2_INT, IsrForUSBDma2);
+  	//setIRQHandler(nDMA3_INT, Dma3Done);
   	setIRQHandler(nIIC_INT, IICInt);
   	setIRQHandler(nEXT8_23_INT,ExternIntDevice);
   	setIRQHandler(nUSBD_INT,usbIRQ);
@@ -114,14 +115,12 @@ void setupIRQEnv()
     Enable_EInt(IRQ_LAN);
   	Enable_Int(nTIMER0_INT);
   	Enable_Int(UART0_INT);
-  	Enable_Int(nDMA0_INT);
-  	Enable_Int(nDMA1_INT);
+  	//Enable_Int(nDMA0_INT);
+  	//Enable_Int(nDMA1_INT);
   	Enable_Int(nDMA2_INT);
-  	Enable_Int(nDMA3_INT);
+  	//Enable_Int(nDMA3_INT);
   	Enable_Int(nIIC_INT);
   	Enable_Int(nEXT8_23_INT);
   	Enable_Int(nUSBD_INT);
 }
-
-
 

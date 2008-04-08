@@ -70,7 +70,7 @@ void PortInit(void)
     //Binary :     11         11   ,  00      00  ,  00        00
     rGPGCON = 0xff00131a;	//GPG0,1,3 input, GPG2,6 output GPG5,7,8,9,10,11 input
     rGPGUP  = 0xffff;	// The pull up function is disabled GPG[15:0]
-		rGPGDAT = 0;	//GPG2,6 output0
+		//rGPGDAT = 0;	//GPG2,6 output0
 
     //*** PORT H GROUP
     //Ports  :  GPH10    GPH9  GPH8 GPH7  GPH6  GPH5 GPH4 GPH3 GPH2 GPH1  GPH0 

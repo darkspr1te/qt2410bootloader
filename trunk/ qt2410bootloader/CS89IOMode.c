@@ -6,13 +6,14 @@
 #include "arp.h"
 #include "ip.h"
 #include "udp.h"
-#include "utils.h"
-extern bool startTFTP;
-u_char CS8900Amac[6]={0x00,0x80,0x48,0x12,0x34,0x56};
-#define IOBASEAddr 0x19000300 //nGCS3:0x18000000 | 1<<24 to choose IO mode op and plus 300h for IO registers
+#include "utility.h"
 
+#define IOBASEAddr 0x19000300 //nGCS3:0x18000000 | 1<<24 to choose IO mode op and plus 300h for IO registers
 #define IOREAD(o)					((u_short)*((volatile u_short *)(IOBASEAddr + (o))))
 #define IOWRITE(o, d)				*((volatile u_short *)(IOBASEAddr + (o))) = (u_short)(d)
+
+extern bool startTFTP;
+extern systemInfo *globalSysInfo;
 
 //according to data sheet page 75. I/O Space operation
 //Specify the offset of the PacketPage Memory to visit the registers 
@@ -115,7 +116,7 @@ bool InitControlReg()
 	u_short temp;
 	u_short *MAC;
 	
-	MAC=(u_short *)CS8900Amac;
+	MAC=(u_short *)globalSysInfo->MACAddr;
 	temp =ReadPktPageReg(PKTPG_LINE_CTL);
 	temp|= LINE_CTL_10_BASE_T;
 	temp|= LINE_CTL_MOD_BACKOFF;
@@ -160,7 +161,6 @@ void TransmitPacket(u_char *buffer,u_short len)
 	
 	while (1)
 	{	
-		Delay(100);
 		data=ReadPktPageReg(PKTPG_BUS_ST);
 		if (data & BUS_ST_RDY_4_TX_NOW) break;
 		else ++event;
@@ -237,7 +237,7 @@ void RecvRoutine()
 	}else free_skb(skb);
 }
 
-void  RxPacketStatus()
+void RxPacketStatus()
 {
 	u_short event;
 	
@@ -266,7 +266,8 @@ void TestTransmitPacket()
 }
 int board_eth_get_addr(unsigned char *addr)
 {
-	memcpy(addr, CS8900Amac, ETH_ALEN);
+	memcpy(addr,globalSysInfo->MACAddr, ETH_ALEN);
 	return 0;
 }
+
 

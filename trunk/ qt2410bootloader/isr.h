@@ -31,7 +31,7 @@
 #define Clear_SRCPendingBit(n)     SRCPND_REG = (1<<(n))
 #define Clear_INTPendingBit(n)     INTPND_REG = (1<<(n))
 #define Enable_EInt(n)          rEINTMASK&=~(1<<(n)) 
-#define Disable_EInt            rEINTMASK=0xffffff
+#define Disable_EInt()            rEINTMASK=0xffffff
 #define Clear_EIntPendingBit(n) rEINTPEND=(1<<(n))
 // 中斷向量最大值
 #define	IRQ_INT_NO	32
@@ -95,5 +95,10 @@ __inline void disable_IRQ(void)
   }
 }
 
-
+#define ClearPending(bit) {\
+                rSRCPND = bit;\
+                rINTPND = bit;\
+                rINTPND;\
+                }       
+      
 

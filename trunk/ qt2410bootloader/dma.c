@@ -1,20 +1,10 @@
 #include "sys.h"
+#include "dma.h"
 
 static volatile int dmaDone;
 #define	_NONCACHE_STARTADDRESS	0x32000000
 
-typedef struct tagDMA
-{
-    volatile unsigned int DISRC;	    //0x0
-    volatile unsigned int DISRCC;       //0x4
-    volatile unsigned int DIDST;	    //0x8
-    volatile unsigned int DIDSTC;       //0xc
-    volatile unsigned int DCON;	        //0x10
-    volatile unsigned int DSTAT;	    //0x14
-    volatile unsigned int DCSRC;	    //0x18
-    volatile unsigned int DCDST;	    //0x1c
-    volatile unsigned int DMASKTRIG;    //0x20
-}DMA;
+
 
 
 void DMA_M2M(int ch,int srcAddr,int dstAddr,int tc,int dsz,int burst)
