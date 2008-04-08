@@ -84,7 +84,7 @@ u_char busyWait()
 
 // A[25:14][13:9]
 //  block   page
-void EraseBlock(u_int Address)
+int EraseBlock(u_int Address)
 {
 	//we have 4096 blocks so we use 12 bit to represent in 4 cycles 
 	u_char stat;
@@ -98,12 +98,12 @@ void EraseBlock(u_int Address)
 	NFWriteAddress((Address>>16)&0xff);//A25
 	NFWriteCommand(ERASECMD1);
 	stat=busyWait();
-	if (!stat) printf("erase success\n\r");
-	else printf("erase error\n\r");
 	NFDisable();
+	if (!stat) return SUCCESS;
+	else return FAIL;
 	
 }
-void WritePage(u_int Address,u_char *buffer)
+bool WritePage(u_int Address,u_char *buffer)
 {
 	//A0~A7 Column address
 	//A9~A24 Row address
@@ -129,12 +129,12 @@ void WritePage(u_int Address,u_char *buffer)
     	NFWriteData(eccBuffer[i]);
 	NFWriteCommand(PROGCMD1);
 	stat=busyWait();
-	if (!stat) printf("sucess program\n\r");
-	else printf("Error program\n\r");
 	NFDisable();
+	if (!stat) return SUCCESS;//printf("sucess program\n\r");
+	else FAIL;//printf("Error program\n\r");
 }
 
-void ReadPage(u_int Address,u_char *buffer)
+bool ReadPage(u_int Address,u_char *buffer)
 {
 	//A0~A7 Column address
 	//A9~A24 Row address
@@ -165,8 +165,8 @@ void ReadPage(u_int Address,u_char *buffer)
 	NFDisable();
 	//check ecc
 	if (ecc[0]==eccBuffer[0] && ecc[1]==eccBuffer[1] && ecc[2]==eccBuffer[2])
-		printf("Read Completed!ECC Check passwd\n\r");
-	else printf("Read Failed!ECC Check failed\n\r");
+		return SUCCESS;//printf("Read Completed!ECC Check pass\n\r");
+	else return FAIL;//printf("Read Failed!ECC Check failed\n\r");
 }
 
 
@@ -209,7 +209,7 @@ u_int linearAddressConvert(u_int adr)
 	column=adr %512;
 	page=adr/512;
 	block=adr/16384;
-	printf("Column %2x,page %2x,block %2x\n\r",column,page,block);
+	//printf("Column %2x,page %2x,block %2x\n\r",column,page,block);
     return CombineAddress(column,page,block);
 }
 
@@ -265,3 +265,38 @@ void NANDFlashTest()
 	printf("\n\rNAND Flash read/write test completed\n\r");
 }
 
+void PerformErase(u_int inaddress,u_int size)
+{
+	u_int i,address,outblock;
+	int ret;
+	
+	address=linearAddressConvert(inaddress);
+	outblock=blockAddressConvert(inaddress);
+	
+	printf("Start Erasing\n\r");
+	for (i=0;i<size;i+=0x4000)//32(page)*512(bytes) per block
+	{
+		ret=EraseBlock(outblock);
+		outblock++;
+		if (ret==SUCCESS)
+			printf(".");
+		else printf("*");
+	}
+	printf("\n\rErase block success\n\r");
+}
+
+void PerformTotalErase()
+{
+	u_int i;
+	int ret;
+	
+	printf("Start Erasing\n\r");
+	for (i=41;i<4096;i++)
+	{
+		ret=EraseBlock(i);
+		if (ret==SUCCESS)
+			printf(".");
+		else printf("*");
+	}
+	printf("\n\rErase Success\n\r");
+}

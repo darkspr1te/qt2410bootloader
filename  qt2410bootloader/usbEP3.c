@@ -1,5 +1,6 @@
 #include "sys.h"
 #include "usb.h"
+#include "isr.h"
 extern volatile u_int download_addr;
 extern volatile u_char *downPt;
 extern volatile u_int download_len;
@@ -13,10 +14,6 @@ static void RdPktEp3_CheckSum(u_char *buf,int num);
 // - out_csr3 is valid.
 // ===================================================================
 
-#define CLR_EP3_OUT_PKT_READY() rOUT_CSR1_REG= ( out_csr3 &(~ EPO_WR_BITS)&(~EPO_OUT_PKT_READY) ) 
-#define SET_EP3_SEND_STALL()	rOUT_CSR1_REG= ( out_csr3 & (~EPO_WR_BITS)| EPO_SEND_STALL) )
-#define CLR_EP3_SENT_STALL()	rOUT_CSR1_REG= ( out_csr3 & (~EPO_WR_BITS)&(~EPO_SENT_STALL) )
-#define FLUSH_EP3_FIFO() 		rOUT_CSR1_REG= ( out_csr3 & (~EPO_WR_BITS)|EPO_FIFO_FLUSH) )
 
 // ***************************
 // *** VERY IMPORTANT NOTE ***
@@ -29,6 +26,7 @@ extern u_int UsbFunction;
 extern u_int UsbState;
 extern u_int UsbInLength;
 extern u_char *UsbTxAddr;
+extern systemInfo *globalSysInfo;
 
 u_char ep3Buf[EP3_PKT_SIZE];
 
@@ -45,27 +43,32 @@ void Ep3Handler(void)
 		
 		if(download_len==0)
 		{
+				
 			RdPktEp3((u_char *)downPt, 8);
 			
 			download_addr = *(u_int *)downPt;
+			//replace the download address to bootloader download address
+			download_addr=globalSysInfo->ApplicationLoadAddress;
 			download_len  = *(u_int *)(downPt+4);
 //			checkSum=0;
 			downPt=(u_char *)download_addr;
 			
 			RdPktEp3_CheckSum((u_char *)downPt, fifoCnt-8); //The first 8-bytes are deleted.	    
   	    	downPt+=fifoCnt-8;  
-  	    
-	  	#if USBDMA
+  	    	#ifdef USBDMA
     	 	    //CLR_EP3_OUT_PKT_READY() is not executed. 
 				//So, USBD may generate NAK until DMA2 is configured for USB_EP3;
-     	    //DisableIrq(BIT_USBD);	
+     	    
+     	    Disable_Int(nUSBD_INT);	
       	    return;	
-	  	#endif	
+	  		#endif
+	  	
 		}
 		else
 		{
 		#if USBDMA    	
 			//DbgOut("<ERROR>");
+			printf("DMA error\n\r");
 		#endif    
 		    RdPktEp3_CheckSum((u_char *)downPt,fifoCnt);
 	    	downPt+=fifoCnt;  //fifoCnt=64

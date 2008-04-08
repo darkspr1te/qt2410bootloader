@@ -7,7 +7,7 @@
  Apr.07.2000:purnnamu: first release. 
  ****************************************************************/
 //option definitions
-#define USBDMA			false
+#define USBDMA			true
 #define USBDMA_DEMAND 	false	//the downloadFileSize should be (64*n)
 #define BULK_PKT_SIZE	32
 
@@ -279,3 +279,7 @@ struct USB_ENDPOINT_DESCRIPTOR
 
 #define PWR_REG_DEFAULT_VALUE (DISABLE_SUSPEND)
 
+#define CLR_EP3_OUT_PKT_READY() rOUT_CSR1_REG= ( out_csr3 &(~ EPO_WR_BITS)&(~EPO_OUT_PKT_READY) ) 
+#define SET_EP3_SEND_STALL()	rOUT_CSR1_REG= ( out_csr3 & (~EPO_WR_BITS)| EPO_SEND_STALL) )
+#define CLR_EP3_SENT_STALL()	rOUT_CSR1_REG= ( out_csr3 & (~EPO_WR_BITS)&(~EPO_SENT_STALL) )
+#define FLUSH_EP3_FIFO() 		rOUT_CSR1_REG= ( out_csr3 & (~EPO_WR_BITS)|EPO_FIFO_FLUSH) )

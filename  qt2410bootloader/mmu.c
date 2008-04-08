@@ -16,22 +16,22 @@ void mmu_tlb_init()
 	for(entry_index = 0x0; entry_index < 0x1000;entry_index+=0x100000) 
  	{
  		/*section table's entry:AP=0b11,domain=0,Cached,write-through mode(WT)*/
- 		*(mmu_tlb_base+(entry_index>>20))=entry_index|(0x03<<10)|(0<<5)|(1<<4)| 0x02;
+ 		*(mmu_tlb_base+(entry_index>>20))=entry_index|(0x03<<10)|(0<<5)|(1<<4)|(0<<2)| 0x02;
  	}
 	//for NGCS3 ethernet
 	for(entry_index = 0x18000000; entry_index < 0x20000000;entry_index += 0x100000)
  	{
  		/*section table's entry:AP=0b11,domain=0,NCNB*/	
- 		*(mmu_tlb_base+(entry_index>>20)) =entry_index |(0x03<<10)|(0<<5)|(1<<4)| 0x02;
+ 		*(mmu_tlb_base+(entry_index>>20)) =entry_index |(0x03<<10)|(0<<5)|(1<<4)|(0<<2)| 0x02;
  	} 
 	
 	
      /*SDRAM*/
  	for(entry_index = 0x30000000; entry_index < 0x34000000;entry_index+=0x100000)
  	{
- 		/*section table's entry:AP=0b11,domain=0,Cached,write-through mode(WT)*/
+ 		/*section table's entry:AP=0b11,domain=0,Non-Cached,write-through mode(WT)*/
  		
- 		*(mmu_tlb_base+(entry_index>>20))=entry_index |(0x03<<10)|(0<<5)|(1<<4)|(1<<3)|0x02;
+ 		*(mmu_tlb_base+(entry_index>>20))=entry_index |(0x03<<10)|(0<<5)|(1<<4)|(1<<3)|(0<<2)|0x02;
  		//REG32( MMU_TABLE_BASE+(entry_index>>20))=entry_index |(0x03<<10)|(0<<5)|(1<<4)|(1<<3)|0x02;
  		//weired 4 byte alignment problems
  		
@@ -40,7 +40,7 @@ void mmu_tlb_init()
  	for(entry_index = 0x48000000; entry_index < 0x60000000;entry_index += 0x100000)
  	{
  		/*section table's entry:AP=0b11,domain=0,NCNB*/	
- 		*(mmu_tlb_base+(entry_index>>20)) =entry_index |(0x03<<10)|(0<<5)|(1<<4)| 0x02;
+ 		*(mmu_tlb_base+(entry_index>>20)) =entry_index |(0x03<<10)|(0<<5)|(1<<4)|(0<<2)| 0x02;
  	}
  	/*exception vector*/
  	/*section table's entry:AP=0b11,domain=0,Cached,write-through mode(WT)*/
@@ -93,3 +93,5 @@ step2:
 		mcr p15, 0, r0, c1, c0, 0
 	}
 }
+
+

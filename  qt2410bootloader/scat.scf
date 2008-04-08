@@ -1,8 +1,8 @@
 
-Flash 0x30004000 0x4000000
+Flash 0x33A00000 0x100000
 {      
     
-     EXEC1 0x30004000 0x4000000
+     EXEC1 0x33A00000 0x100000
     {  
         init.o (Init, +First) 
         * (+RO,+RW,+ZI)

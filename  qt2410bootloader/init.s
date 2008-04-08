@@ -1,7 +1,7 @@
 BIT_SELFREFRESH EQU	(1<<22)
 
 ;stack base address
-_STACK_BASEADDRESS	EQU 0x31ff8000  
+_STACK_BASEADDRESS	EQU 0x339f8000  
 
 ;BWSCON
 DW8		    EQU	(0x0)
@@ -79,8 +79,8 @@ B6_Trcd		EQU	0x1	;3clk
 B6_SCAN		EQU	0x1	;9bit
 
 ;Bank 7 parameter
-B7_MT		EQU	0x0	; ROM or SRAM
-B7_Trcd		EQU	0x0	;2clk
+B7_MT		EQU	0x3	; ROM or SRAM
+B7_Trcd		EQU	0x1	;2clk
 ;B7_Trcd		EQU	0x1	;3clk
 B7_SCAN		EQU	0x1	;9bit
 
@@ -191,7 +191,7 @@ Reset_Handler
     STR r1,[r0]
     
     LDR r0,=MPLLCON
-    ;ldr	r1,=((M_MDIV<<12)+(M_PDIV<<4)+M_SDIV)  ;Fin=12MHz,Fout=50MHz
+    ;LDR	r1,=((92<<12)+(4<<4)+1)  ;Fin=12MHz,Fout=50MHz
     LDR r1,=((0x5c<<12)+(0x4<<4)+0x0)  ;Fin=12MHz,Fout=200MHz
     STR r1,[r0]
     

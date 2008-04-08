@@ -20,11 +20,13 @@ void UART0_Init(void)
 	int	i;
 
 	rUFCON0 = 0x0;		//FIFO disable
-	rUBRDIV0   =((int)(50000000/16./115200 + 0.5) -1);		// set baud rate
+	rUBRDIV0   =((int)(50000000/16./115200 + 0.5) -1);		// set baud rate P50mhz
+	//rUBRDIV0   =((int)(25000000/16./115200 + 0.5) -1);		// set baud rate p25mhz
 	rULCON0  = 0x3;		//Normal,No parity,1 stop,8 bit
 	//rUCON0   = 0x345;	//rx=edge,tx=level,disable timeout int.,enable rx error int.,normal,interrupt or polling
-	rUMCON0 = 0x0;
-	rUCON0|= (1<<9)|(1<<8)|(0<<7)|(1<<6)|(0<<5)|(0<<4)|(1<<2)|(1);
+	//rUMCON0 = 0x0;
+	//rUCON0|= (1<<9)|(1<<8)|(0<<7)|(1<<6)|(0<<5)|(0<<4)|(1<<2)|(1);
+	rUCON0=0x245;
 	while(!(rUTRSTAT0 & 0x4));
 	SUBSRCPND_REG=(BIT_SUB_RXD0|BIT_SUB_TXD0|BIT_SUB_ERR0);
 	INTSUBMSK_REG=~(BIT_SUB_ERR0|BIT_SUB_RXD0);
@@ -62,6 +64,7 @@ void UART0_RX_ISR(void)
     //}
     //printf("read int\n");
 }
+
 // UART0 TX isr
 void UART0_TX_ISR(void)
 {

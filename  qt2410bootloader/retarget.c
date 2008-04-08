@@ -50,13 +50,13 @@ int fputc(int ch, FILE *f)
 	char tempch = ch;
 	char temp='\n';
 
-    if (ch=='\r')
+   /* if (ch=='\r')
     {
     	WriteComPort(&tempch, 1);
     	WriteComPort(&temp, 1);
     }
-    else WriteComPort(&tempch, 1);
-
+    else*/ 
+    WriteComPort(&tempch, 1);
     return ch;
     
 }
@@ -69,6 +69,7 @@ int getc(FILE *f)
 	if(ReadComPort(&tempch, 1)==1)
 	{
 		x=tempch;
+		WriteComPort(&tempch, 1);
 		return x;
 	}
 	else
@@ -82,6 +83,7 @@ int fgetc(FILE *f)
 	
 	while(ReadComPort(&tempch, 1)==0);
 	x=tempch;
+	WriteComPort(&tempch, 1);
 	return x;
 /*		 
 	if(ReadComPort(&tempch, 1)==1)
@@ -113,9 +115,19 @@ void _ttywrch(int ch)
     char tempch = ch;
 
 	WriteComPort(&tempch, 1);
+	
 }
 
-
+int getch()
+{
+	int x;
+	char tempch;
+	
+	while(ReadComPort(&tempch, 1)==0);
+	x=tempch;
+	WriteComPort(&tempch, 1);
+	return x;
+}
 
 
 __value_in_regs struct __initial_stackheap __user_initial_stackheap(
@@ -123,7 +135,7 @@ __value_in_regs struct __initial_stackheap __user_initial_stackheap(
 {
     struct __initial_stackheap config;
     
-    config.heap_base = 0x31ff8000;
+    config.heap_base = 0x335f8000;
     config.stack_base = SP;
 
     return config;
