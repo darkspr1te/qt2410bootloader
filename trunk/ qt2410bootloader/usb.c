@@ -660,8 +660,7 @@ void IsrForUSBDma2(void)
     {
     	totalDmaCount = download_len;
 			
-    	ConfigEp3IntMode();
-		 printf("download almost done\n\r");	
+    	ConfigEp3IntMode();	
     	if(out_csr3& EPO_OUT_PKT_READY)
     	{
    	    	CLR_EP3_OUT_PKT_READY();

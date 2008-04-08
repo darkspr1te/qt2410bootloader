@@ -610,3 +610,4 @@ typedef struct _systemInfo
 #define LKIM 1
 #define LKFS 2
 #define OKIM 3
+#define BLIM 4

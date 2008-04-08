@@ -138,6 +138,16 @@ WTCON     EQU  0x53000000       ;Watch-dog timer mode
 WTDAT     EQU  0x53000004       ;Watch-dog timer data
 WTCNT     EQU  0x53000008       ;Eatch-dog timer count
 
+;=================
+; NAND flash
+;=================
+NFCONF      EQU  0x4e000000     ;NAND Flash configuration
+NFCMD       EQU  0x4e000004     ;NADD Flash command
+NFADDR      EQU  0x4e000008     ;NAND Flash address
+NFDATA      EQU  0x4e00000c     ;NAND Flash data
+NFSTAT      EQU  0x4e000010     ;NAND Flash operation status
+NFECC       EQU  0x4e000014     ;NAND Flash ECC
+
 ;Pre-defined constants
 USERMODE    EQU 	0x10
 FIQMODE     EQU 	0x11
@@ -158,17 +168,15 @@ FIQStack	EQU	(_STACK_BASEADDRESS-0x0)	;0x33ff8000 ~
 
 	
 	   ; The main entry of mon program
-	;IMPORT  ISR_IRQ
-		
+	;IMPORT  Start
+	IMPORT  __main
 	AREA    Init, CODE, READONLY 
 
 	; --- Standard definitions of mode bits and interrupt (I & F) flags in PSRs
 
 	ENTRY
 
-    EXPORT Reset_Handler
-    
-    
+    EXPORT Reset_Handler    
 Reset_Handler
     LDR r0,=WTCON ;close watch dog 
     LDR r1,=0x0
@@ -224,6 +232,178 @@ loop10
 	cmp	r2, r0
 	bne loop10
 
+;For Nand Boot
+	ldr	r0, =BWSCON
+	ldr	r0, [r0]
+	ands	r0, r0, #6		;OM[1:0] != 0, NOR FLash boot
+	bne	Init_Stack		;do not read nand flash	
+	ldr	r0, =0x33A00000			;OM[1:0] == 0, NAND FLash boot	
+	cmp	r0, #0				;if use Multi-ice,
+	;bne	Init_Stack		;do not read nand flash for boot
+	
+	mov	r5, #NFCONF
+	ldr	r0,	=(1<<15)|(1<<12)|(1<<11)|(7<<8)|(7<<4)|(7)
+	str	r0,	[r5]
+	bl	ReadNandID
+	mov	r6, #0
+	ldr	r0, =0xec73
+	cmp	r5,	r0
+	beq	%F1
+	ldr	r0, =0xec75
+	cmp	r5, r0
+	beq	%F1
+	mov	r6, #1
+1	
+	bl	ReadNandStatus	
+	
+	mov	r8, #0
+	;ldr	r9, =__main	
+	ldr r9,=0x33A00000
+2	
+	ands	r0, r8, #0x1f
+	bne		%F3
+	mov		r0, r8
+	bl		CheckBadBlk
+	cmp		r0, #0
+	addne	r8, r8, #32
+	bne		%F4
+3	
+	mov	r0, r8
+	mov	r1, r9
+	bl	ReadNandPage
+	add	r9, r9, #512
+	add	r8, r8, #1
+4	
+	cmp	r8, #256			;128K
+	bcc	%B2
+	
+	mov	r5, #NFCONF			;DsNandFlash
+	ldr	r0, [r5]
+	and	r0, r0, #~0x8000
+	str	r0, [r5]
+	ldr	pc, =Init_Stack
+ReadNandID
+	mov		 r7,#NFCONF	
+	ldr      r0,[r7,#0]		;NFChipEn();
+	bic      r0,r0,#0x800
+	str      r0,[r7,#0]	
+	mov      r0,#0x90		;WrNFCmd(RdIDCMD);
+	strb     r0,[r7,#4]	
+	mov      r4,#0			;WrNFAddr(0);
+	strb     r4,[r7,#8]	
+1							;while(NFIsBusy());
+	ldr      r0,[r7,#0x10]	
+	tst      r0,#1
+	beq      %B1
+	ldrb     r0,[r7,#0xc]	;id  = RdNFDat()<<8;
+	mov      r0,r0,lsl #8	
+	ldrb     r1,[r7,#0xc]	;id |= RdNFDat();
+	orr      r5,r1,r0	
+	ldr      r0,[r7,#0]		;NFChipDs();
+	orr      r0,r0,#0x800
+	str      r0,[r7,#0]	
+	mov		 pc,lr	
+	
+ReadNandStatus
+	mov		 r7,#NFCONF
+	ldr      r0,[r7,#0]		;NFChipEn();
+	bic      r0,r0,#0x800
+	str      r0,[r7,#0]
+	mov      r0,#0x70		;WrNFCmd(QUERYCMD);
+	strb     r0,[r7,#4]	
+	ldrb     r1,[r7,#0xc]	;r1 = RdNFDat();
+	ldr      r0,[r7,#0]		;NFChipDs();
+	orr      r0,r0,#0x800
+	str      r0,[r7,#0]
+	mov		 pc,lr
+
+WaitNandBusy
+	mov      r0,#0x70		;WrNFCmd(QUERYCMD);
+	mov      r1,#NFCONF
+	strb     r0,[r1,#4]
+1							;while(!(RdNFDat()&0x40));	
+	ldrb     r0,[r1,#0xc]
+	tst      r0,#0x40
+	beq		 %B1
+	mov      r0,#0			;WrNFCmd(READCMD0);
+	strb     r0,[r1,#4]
+	mov      pc,lr
+
+CheckBadBlk
+	mov		r7, lr
+	mov		r5, #NFCONF
+	
+	bic		r0, r0, #0x1f	;addr &= ~0x1f;
+	ldr      r1,[r5,#0]		;NFChipEn()
+	bic      r1,r1,#0x800
+	str      r1,[r5,#0]	
+
+	mov      r1,#0x50		;WrNFCmd(READCMD2)
+	strb     r1,[r5,#4]	
+	mov		 r1, #5
+	strb     r1,[r5,#8]		;WrNFAddr(5)
+	strb     r0,[r5,#8]		;WrNFAddr(addr)
+	mov      r1,r0,lsr #8	;WrNFAddr(addr>>8)
+	strb     r1,[r5,#8]	
+	cmp      r6,#0			;if(NandAddr)		
+	movne    r0,r0,lsr #16	;WrNFAddr(addr>>16)
+	strneb   r0,[r5,#8]
+	
+	bl		WaitNandBusy	;WaitNFBusy()
+
+	ldrb	r0, [r5,#0xc]	;RdNFDat()
+	sub		r0, r0, #0xff
+	
+	mov      r1,#0			;WrNFCmd(READCMD0)
+	strb     r1,[r5,#4]	
+	
+	ldr      r1,[r5,#0]		;NFChipDs()
+	orr      r1,r1,#0x800
+	str      r1,[r5,#0]
+	
+	mov		pc, r7
+
+ReadNandPage
+	mov		 r7,lr
+	mov      r4,r1
+	mov      r5,#NFCONF
+
+	ldr      r1,[r5,#0]		;NFChipEn()
+	bic      r1,r1,#0x800
+	str      r1,[r5,#0]	
+
+	mov      r1,#0			;WrNFCmd(READCMD0)
+	strb     r1,[r5,#4]	
+	strb     r1,[r5,#8]		;WrNFAddr(0)
+	strb     r0,[r5,#8]		;WrNFAddr(addr)
+	mov      r1,r0,lsr #8	;WrNFAddr(addr>>8)
+	strb     r1,[r5,#8]	
+	cmp      r6,#0			;if(NandAddr)		
+	movne    r0,r0,lsr #16	;WrNFAddr(addr>>16)
+	strneb   r0,[r5,#8]
+	
+	ldr      r0,[r5,#0]		;InitEcc()
+	orr      r0,r0,#0x1000
+	str      r0,[r5,#0]	
+	
+	bl       WaitNandBusy	;WaitNFBusy()
+	
+	mov      r0,#0			;for(i=0; i<512; i++)
+1
+	ldrb     r1,[r5,#0xc]	;buf[i] = RdNFDat()
+	strb     r1,[r4,r0]
+	add      r0,r0,#1
+	bic      r0,r0,#0x10000
+	cmp      r0,#0x200
+	bcc      %B1
+	
+	ldr      r0,[r5,#0]		;NFChipDs()
+	orr      r0,r0,#0x800
+	str      r0,[r5,#0]
+		
+	mov		 pc,r7
+
+
   	B	Init_Stack
 
 
@@ -269,10 +449,11 @@ Init_Stack
      MOV fp,#0 
      MOV a1,#0
      MOV a2,#0
-
+	 
+	 B __main ;We will never come back at this point
 ; --- Now enter the C code
-     IMPORT  __main  
-     B  __main  ; note use B not BL, because an application will never return this way
+       
+     
 
 LTORG
 ;======================================================
