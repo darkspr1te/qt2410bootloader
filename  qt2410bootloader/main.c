@@ -285,6 +285,7 @@ void TFTPFirmwareUpgrade()
 	printf("1.Linux Kernel\n\r");
 	printf("2.Linux File System\n\r");
 	printf("3.Other Kernel Image\n\r");
+	printf("4.Bootloader\n\r");
 	printf("Choice:");
 	scanf("%d",&choice);
 	printf("\n\r");
@@ -318,6 +319,7 @@ void USBFirmwareUpgrade()
 	printf("1.Linux Kernel\n\r");
 	printf("2.Linux File System\n\r");
 	printf("3.Other Kernel Image\n\r");
+	printf("4.Bootloader\n\r");
 	printf("Choice:");
 	scanf("%d",&choice);
 	printf("\n\r");
@@ -377,11 +379,12 @@ void LoadOtherFromNAND()
 	JumpToProgram();
 }
 
+
+
 int main(void)
 {
  	int ret;
  	u_int MyMMUBase;
- 	
  	
  	PortInit();
  	CleanMMUTable();

@@ -314,7 +314,7 @@ void WriteNANDFlash(u_int address,u_int size)
 		else printf("*");
 		address+=512;
 	}
-	printf("Upgrading Success!!\n\r");
+	printf("\n\rUpgrading Success!!\n\r");
 	
 	
 }
@@ -336,6 +336,11 @@ void NANDFlashUpgrade(int area,int size)
 	{
 		WriteNANDFlash(globalSysInfo->OtherKernelImageStart,size);
 		globalSysInfo->OtherKernelImageSize=size;
+	}
+	else if (area==BLIM)
+	{
+		WriteNANDFlash(globalSysInfo->bootImageStart,size);
+		globalSysInfo->bootImageSize=size;
 	}
 	else printf("Wrong Area to upgrade\n\r");
 }
