@@ -104,6 +104,7 @@ void WriteSystemInfo()
 		scanf("%s",ip);
 		sysInfo->IPAddr=str_to_addr(ip);	
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==2)
@@ -115,6 +116,7 @@ void WriteSystemInfo()
 		memcpy(sysInfo->MACAddr,temp,6);
 		free(temp);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==3)
@@ -123,6 +125,7 @@ void WriteSystemInfo()
 		scanf("%s",tempString);
 		sscanf((char *)tempString,"%x",&sysInfo->LinuxKernelImageStart);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==4)
@@ -131,6 +134,7 @@ void WriteSystemInfo()
 		scanf("%s",tempString);
 		sscanf((char *)tempString,"%x",&sysInfo->LinuxKernelImageSize);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==5)
@@ -139,6 +143,7 @@ void WriteSystemInfo()
 		scanf("%s",tempString);
 		sscanf((char *)tempString,"%x",&sysInfo->LinuxFileSystemStart);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==6)
@@ -147,6 +152,7 @@ void WriteSystemInfo()
 		scanf("%s",tempString);
 		sscanf((char *)tempString,"%x",&sysInfo->LinuxFileSystemSize);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==7)
@@ -155,6 +161,7 @@ void WriteSystemInfo()
 		scanf("%s",tempString);
 		sscanf((char *)tempString,"%x",&sysInfo->OtherKernelImageStart);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==8)
@@ -163,6 +170,7 @@ void WriteSystemInfo()
 		scanf("%s",tempString);
 		sscanf((char *)tempString,"%x",&sysInfo->OtherKernelImageSize);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==9)
@@ -171,6 +179,7 @@ void WriteSystemInfo()
 		scanf("%s",tempString);
 		sscanf((char *)tempString,"%x",&sysInfo->ApplicationLoadAddress);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==10)
@@ -194,6 +203,7 @@ void WriteSystemInfo()
 		}while (ch!=13);//13 is enter
 		printf("dbg :sysinfo->param %s",sysInfo->BootParam);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else if (ret==11)
@@ -201,6 +211,7 @@ void WriteSystemInfo()
 		printf("Auto loading linux or other kernel(Linux:1 Other Kernel:0):"); 
 		scanf("%d",&sysInfo->BootOption);
 		EraseBlock(block);
+		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
 	else printf("Warning:Input choice is from 1 to 10\n\r");
@@ -279,7 +290,8 @@ void TFTPLoadAndRun()
 void TFTPFirmwareUpgrade()
 {
 	u_int len;
-	int choice;
+	int choice,result;
+	u_int address,block;
 	
 	printf("Which area you want to upgrade\n\r");
 	printf("1.Linux Kernel\n\r");
@@ -291,7 +303,15 @@ void TFTPFirmwareUpgrade()
 	printf("\n\r");
 	
 	len=StartTFTPServer();
-	NANDFlashUpgrade(choice,len);
+	result=NANDFlashUpgrade(choice,len);
+	if (result==true)
+	{
+		printf("Update image size\n\r");
+		address=linearAddressConvert(SystemInformationAddress);
+		block=blockAddressConvert(SystemInformationAddress);
+		EraseBlock(block);
+		WritePage(address,GlobalSysBuffer);
+	}
 }
 
 void USBLoadAndRun()
@@ -313,7 +333,8 @@ void USBLoadAndRun()
 void USBFirmwareUpgrade()
 {
 	u_int len;
-	int choice;
+	int choice,result;
+	u_int address,block;
 	
 	printf("Which area you want to upgrade\n\r");
 	printf("1.Linux Kernel\n\r");
@@ -330,7 +351,14 @@ void USBFirmwareUpgrade()
 		printf("Image is currupted\n\r");
 		return;
 	}
-	NANDFlashUpgrade(choice,len);
+	result=NANDFlashUpgrade(choice,len);
+	if (result==true)
+	{
+		address=linearAddressConvert(SystemInformationAddress);
+		block=blockAddressConvert(SystemInformationAddress);
+		EraseBlock(block);
+		WritePage(address,GlobalSysBuffer);
+	}
 }
 
 void LoadLinuxFromNAND()
