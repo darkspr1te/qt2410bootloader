@@ -175,7 +175,7 @@ FIQStack	EQU	(_STACK_BASEADDRESS-0x0)	;0x33ff8000 ~
 	; --- Standard definitions of mode bits and interrupt (I & F) flags in PSRs
 
 	ENTRY
-
+ProgramEntry
     EXPORT Reset_Handler    
 Reset_Handler
     LDR r0,=WTCON ;close watch dog 
@@ -237,7 +237,7 @@ loop10
 	ldr	r0, [r0]
 	ands	r0, r0, #6		;OM[1:0] != 0, NOR FLash boot
 	bne	Init_Stack		;do not read nand flash	
-	ldr	r0, =0x33A00000			;OM[1:0] == 0, NAND FLash boot	
+	ldr	r0, =ProgramEntry			;OM[1:0] == 0, NAND FLash boot	
 	cmp	r0, #0				;if use Multi-ice,
 	;bne	Init_Stack		;do not read nand flash for boot
 	
@@ -258,7 +258,8 @@ loop10
 	
 	mov	r8, #0
 	;ldr	r9, =__main	
-	ldr r9,=0x33A00000
+	;ldr r9,=0x33A00000
+	ldr r9,=ProgramEntry
 2	
 	ands	r0, r8, #0x1f
 	bne		%F3

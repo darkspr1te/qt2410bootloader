@@ -17,18 +17,18 @@ extern void usbIRQ();
 extern void IsrForUSBDma2(void);
 
 
-// 宣告中斷向量表格
+//declare interrupt vector table
 voidfun (IntHandlerTable)[IRQ_INT_NO] ;
 
-// 清除中斷狀態
+// mask all interrupt
 void ClrIntStatus(void)
 {
-    INTMSK_REG = 0xffffffff;  // 除了全域中斷來源之外，關閉所有中斷來源
-    INTPND_REG = 0xffffffff;  // 清除所有的等候位元
+    INTMSK_REG = 0xffffffff;  
+    INTPND_REG = 0xffffffff; 
     rEINTMASK=0xffffff;
     rEINTPEND = 0xffffff;
 }
-// 初始化中斷向量表格
+// inital interrupt vector table
 void creatIntHandlerTable(void)
 {
     int i;
@@ -38,7 +38,7 @@ void creatIntHandlerTable(void)
         IntHandlerTable[i] = NULL;
     }
 }
-// 設定中斷向量表格
+// setup interrupt vector table
 void setIRQHandler(int i, voidfun isr)
 {
     if ((i >= 0) && (i < IRQ_INT_NO))
@@ -46,7 +46,7 @@ void setIRQHandler(int i, voidfun isr)
         IntHandlerTable[i] = isr;
     }
 }
-// 中斷服務常式執行進入點
+// ISR entry point
 void ISR_IRQ(void)
 {
     int currentIRQnumber;

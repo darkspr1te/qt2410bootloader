@@ -319,28 +319,36 @@ void WriteNANDFlash(u_int address,u_int size)
 	
 }
 
-void NANDFlashUpgrade(int area,int size)
+bool NANDFlashUpgrade(int area,int size)
 {
 	if (area==LKIM)
 	{
 		WriteNANDFlash(globalSysInfo->LinuxKernelImageStart,size);
 		globalSysInfo->LinuxKernelImageSize=size;
+		return true;
 	}
 	else if (area==LKFS)
 	{
 		WriteNANDFlash(globalSysInfo->LinuxFileSystemStart,size);
 		globalSysInfo->LinuxFileSystemSize=size;
+		return true;
 	
 	}
 	else if (area==OKIM)
 	{
 		WriteNANDFlash(globalSysInfo->OtherKernelImageStart,size);
 		globalSysInfo->OtherKernelImageSize=size;
+		return true;
 	}
 	else if (area==BLIM)
 	{
 		WriteNANDFlash(globalSysInfo->bootImageStart,size);
 		globalSysInfo->bootImageSize=size;
+		return true;
 	}
-	else printf("Wrong Area to upgrade\n\r");
+	else 
+	{
+		printf("Wrong Area to upgrade\n\r");
+		return false;
+	}
 }
