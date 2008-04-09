@@ -239,7 +239,7 @@ loop10
 	bne	Init_Stack		;do not read nand flash	
 	ldr	r0, =ProgramEntry			;OM[1:0] == 0, NAND FLash boot	
 	cmp	r0, #0				;if use Multi-ice,
-	;bne	Init_Stack		;do not read nand flash for boot
+	;bne	Init_Stack		;do not read nand flash for boot(Joey:If you want to use ICE,uncomment this line)
 	
 	mov	r5, #NFCONF
 	ldr	r0,	=(1<<15)|(1<<12)|(1<<11)|(7<<8)|(7<<4)|(7)

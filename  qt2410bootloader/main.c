@@ -3,6 +3,7 @@
 #include "isr.h"
 #include "sys.h"
 
+#define AutoBootSeconds 5
 #define SystemInformationAddress 0x3fffd00
 systemInfo *sysInfo,*globalSysInfo;
 u_char GlobalSysBuffer[512];
@@ -62,7 +63,7 @@ void ReadSystemInformation()
 		sysInfo->OtherKernelImageStart=0x1704000;//block 5c1
 		sysInfo->OtherKernelImageSize=0x600000;
 		sysInfo->ApplicationLoadAddress=0x30008000;
-		sysInfo->BootOption=1;
+		sysInfo->BootOption=3;
 		strcpy(sysInfo->BootParam,"noinitrd root=/dev/mtdblock/2 console=ttySAC0,115200 mem=64M");
 		WritePage(address,buffer);
 	}
@@ -208,7 +209,7 @@ void WriteSystemInfo()
 	}
 	else if (ret==11)
 	{
-		printf("Auto loading linux or other kernel(Linux:1 Other Kernel:0):"); 
+		printf("Auto loading linux or other kernel(Linux:1 Other Kernel:2 NoAutoBoot:3):"); 
 		scanf("%d",&sysInfo->BootOption);
 		EraseBlock(block);
 		memcpy(GlobalSysBuffer,buffer,512);
@@ -250,7 +251,8 @@ void ShowSystemInfo()
 	printf("Boot:Default to startup ");
 	if (sysInfo->BootOption==LinuxStart)
 		printf("Linux\n\r");
-	else printf("Other OS\n\r");
+	else if (sysInfo->BootOption==OtherStart) printf("Other OS\n\r");
+	else printf("No autoboot\n\r");
 	memcpy(GlobalSysBuffer,buffer,512);
 	globalSysInfo=(systemInfo *)GlobalSysBuffer;
 }
@@ -412,7 +414,7 @@ void LoadOtherFromNAND()
 int main(void)
 {
  	int ret;
- 	u_int MyMMUBase;
+ 	u_int MyMMUBase,i=0;
  	
  	PortInit();
  	CleanMMUTable();
@@ -432,6 +434,30 @@ int main(void)
  	
  	
  	
+ 	if (globalSysInfo->BootOption==LinuxStart)
+ 	{
+ 		printf("AutoBoot to Linux\n\r");
+ 		while (getKey()==false)
+ 		{			
+ 			Delay(1000);
+ 			printf("Seconds left to AutoBoot:%d\n\r",AutoBootSeconds-i);
+ 			i++;
+ 			if (i>=AutoBootSeconds) LoadLinuxFromNAND();
+ 		}
+ 	}
+ 	else if (globalSysInfo->BootOption==OtherStart)
+ 	{
+ 		printf("AutoBoot to Other kernel\n\r");
+ 		while (getKey()==false)
+ 		{
+ 			
+ 			Delay(1000);
+ 			printf("Seconds left to AutoBoot:%d\n\r",AutoBootSeconds-i);
+ 			i++;
+ 			if (i>=AutoBootSeconds) LoadOtherFromNAND();
+ 		}
+ 	}
+ 	else printf("No AutoBoot.Go to Menu\n\r");
  	
  	while (1)
   	{
