@@ -129,6 +129,12 @@ int getch()
 	return x;
 }
 
+int getKey()
+{
+	char tempch;
+	if (ReadComPort(&tempch, 1)==0) return 0;
+	else return 1;
+}
 
 __value_in_regs struct __initial_stackheap __user_initial_stackheap(
         unsigned R0, unsigned SP, unsigned R2, unsigned SL)
