@@ -1,5 +1,5 @@
 //mmu related definitions
-#define MMU_TABLE_BASE 0x30000000
+#define MMU_TABLE_BASE 0x33FFC000
 #define MMU_FULL_ACCESS		(3 << 10)	/* access permission bits */
 #define MMU_DOMAIN		(0 << 5)	/* domain control bits */
 #define MMU_SPECIAL		(1 << 4)	/* must be 1 */

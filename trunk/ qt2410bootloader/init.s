@@ -1,3 +1,4 @@
+BOOTFromNAND EQU 1  ;0 means you boot from ice
 BIT_SELFREFRESH EQU	(1<<22)
 
 ;stack base address
@@ -237,9 +238,10 @@ loop10
 	ldr	r0, [r0]
 	ands	r0, r0, #6		;OM[1:0] != 0, NOR FLash boot
 	bne	Init_Stack		;do not read nand flash	
-	ldr	r0, =ProgramEntry			;OM[1:0] == 0, NAND FLash boot	
-	cmp	r0, #0				;if use Multi-ice,
-	;bne	Init_Stack		;do not read nand flash for boot(Joey:If you want to use ICE,uncomment this line)
+	;ldr	r0, =ProgramEntry			;OM[1:0] == 0, NAND FLash boot	
+	ldr r0,=BOOTFromNAND ;1 is boot from nand, and 0 is boot from ice
+	cmp	r0, #1				;if use Multi-ice,
+	bne	Init_Stack		;do not read nand flash for boot(Joey:If you want to use ICE,uncomment this line)
 	
 	mov	r5, #NFCONF
 	ldr	r0,	=(1<<15)|(1<<12)|(1<<11)|(7<<8)|(7<<4)|(7)
