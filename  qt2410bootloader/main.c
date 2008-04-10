@@ -419,7 +419,7 @@ int main(void)
  	PortInit();
  	CleanMMUTable();
  	mmu_tlb_init();
- 	MyMMUBase=MMU_TABLE_BASE+SIZE_64M;
+ 	MyMMUBase=MMU_TABLE_BASE;//MMU_TABLE_BASE+SIZE_64M;
  	StartMMU(MyMMUBase);
  	setupIRQEnv();
  	InitIRQDevices();
