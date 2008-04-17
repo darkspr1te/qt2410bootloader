@@ -3,7 +3,7 @@ OUTPUT_ARCH(arm)
 ENTRY(_bootstart)
 SECTIONS
 {
-	. = 0x30008000;
+	. = 0x33A00000;
 	. = ALIGN(4);
 	.text      :
 	{
