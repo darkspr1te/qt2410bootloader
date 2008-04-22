@@ -1,8 +1,8 @@
 # The C compiler and linker
 
-CC=arm-linux-gcc 
-LD=arm-linux-ld
-AS=arm-linux-as
+CC=arm-elf-gcc 
+LD=arm-elf-ld
+AS=arm-elf-as
 
 
 DRIVERS=drivers
@@ -42,7 +42,6 @@ OBJ_FILES= \
 	$(TFTP)/udp.o \
 	$(UTILITY)/utility.o \
 	$(UTILITY)/printLib.o \
-	$(UTILITY)/heap.o \
 
 
 SRCHEADER= \
@@ -51,18 +50,18 @@ SRCHEADER= \
 	 $(UTILITY)/*.h \
 	 $(TFTP)/*.h \
 
-LIBPATH=/usr/local/arm/2.95.3/lib/gcc-lib/arm-linux/2.95.3
+LIBPATH=-LC:\yagarto\lib\gcc\arm-elf\4.2.2 -LC:\yagarto\arm-elf\lib
 ARMINC=/usr/local/arm/2.95.3/arm-linux/include
-CLIBS = -L$(LIBPATH) -lc -lgcc
+CLIBS = $(LIBPATH) -lc -lgcc
 CINCFLAG=-I$(BOARD) -I$(DRIVERS) -I$(UTILITY) -I$(TFTP) -I$(ARMINC)
-#CFLAGS=-marm -g  $(CINCFLAG)
-CFLAGS=-fno-builtin -nostdlib -nostdinc -g -c  $(CINCFLAG)
-AFLAGS=-mapcs-32 -EL 
-LDFLAGS=-p -X -Tbootloader.lds
+#CFLAGS=-marm -gdwarf  $(CINCFLAG)
+CFLAGS=-fno-builtin -nostdlib -nostdinc -c -g $(CINCFLAG)
+AFLAGS=-EL 
+LDFLAGS=-Tbootloader.lds
 OBJCOPYFLAGS = -R .comment -R .stab -R .stabstr
 
 all : biosjy2410
-	arm-linux-objcopy -O binary -S biosjy2410 biosjy2410.bin $(OBJCOPYFLAGS)
+	arm-elf-objcopy -O binary -S biosjy2410 biosjy2410.bin $(OBJCOPYFLAGS)
 	
 %.o:%.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -71,7 +70,7 @@ all : biosjy2410
 	$(AS) $(AFLAGS) $< -o $@
 		
 biosjy2410 : $(OBJ_FILES)
-		$(LD) $(LDFLAGS)  $(OBJ_FILES) -static -o $@ $(CLIBS)
+		$(LD) $(LDFLAGS)  $(OBJ_FILES) -Bstatic -o $@ $(CLIBS)
 		@touch $@
 
 clean:

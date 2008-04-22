@@ -168,10 +168,10 @@
 
 /* The main entry of init program*/
 
-.globl _bootstart
+.globl _start
 .globl Reset_Handler
 .global main
-_bootstart:
+_start:
 Reset_Handler:
     LDR r0,=WTCON /*close watch dog */
     LDR r1,=0x0
@@ -257,7 +257,7 @@ loop10:
 	mov	r8, #0
 	/*ldr	r9, =__main	*/
 	/*ldr r9,=0x33A00000*/
-	ldr r9,=_bootstart
+	ldr r9,=_start
 2:	
 	ands	r0, r8, #0x1f
 	bne		3f
@@ -454,7 +454,7 @@ CopyVector
        
      
 
-.ltorg
+.align 4
 /*======================================================
  Memory System Initialize Data for 2410
 ======================================================

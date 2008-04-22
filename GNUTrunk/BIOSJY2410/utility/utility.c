@@ -1,6 +1,5 @@
 #include "sys.h"
 //#include "stdarg.h"
-
 //Linux image could be packed to multi-file object
 #define IH_MAGIC	0x27051956	/* Image Magic Number		*/
 typedef struct _ImageHeader
@@ -76,6 +75,7 @@ u_int str_to_addr(const char *addr)
 
 	return htonl(ip);
 }
+
 
 void addr_fprint(u_int x)
 {
@@ -243,7 +243,7 @@ void initLinuxParam()
 	for(i=0; linux_params[i]; i++)
 		params->commandline[i] = linux_params[i];
 		
-	printf("Boot Parameter:%s\n\r",linux_params);
+	//printf("Boot Parameter:%s\n\r",linux_params);
 	
 	
 }
@@ -385,4 +385,5 @@ char *strcpy(char *dest, const char *src)
 
   return dest;
 }*/
+
 

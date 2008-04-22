@@ -10,7 +10,7 @@ typedef char *va_list;
 
 //taken from bios-lt
 
-unsigned long strtoul(char *s, char **endptr, int radix)
+/*unsigned long strtoul(char *s, char **endptr, int radix)
 {
 	unsigned long ret;
 	int i;
@@ -35,7 +35,7 @@ unsigned long strtoul(char *s, char **endptr, int radix)
 	}
 
 	return ret;
-}
+}*/
 
 
 char *gets(char *s, int n)

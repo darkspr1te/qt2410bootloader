@@ -9,7 +9,7 @@
 #include "utility.h"
 
 #define IOBASEAddr 0x19000300 //nGCS3:0x18000000 | 1<<24 to choose IO mode op and plus 300h for IO registers
-#define IOREAD(o)					((u_short)*((volatile u_short *)(IOBASEAddr + (o))))
+#define IOREAD(o)					*((volatile u_short *)(IOBASEAddr + o))
 #define IOWRITE(o, d)				*((volatile u_short *)(IOBASEAddr + (o))) = (u_short)(d)
 
 extern bool startTFTP;
@@ -45,7 +45,6 @@ bool ProbeCS8900A()
 	//for the CS8900A.
 	
 	pic=(u_short)*((volatile u_short *)(IOBASEAddr+PKPGPTR));
-	printf("pic:%d\n\r",pic);
 	if (pic!= CS8900_SIGNATURE) return false;
 	else printf("CS8900A signature:0x%08lx\n\r",pic);
 	//read EISA
@@ -106,9 +105,12 @@ void EnableCS8900AIRQ(void)
 	/* If INTERRUPT_NUMBER is 0,							*/
 	/*	Interrupt request will be generated from INTRQ0 pin */
 	WritePktPageReg(PKTPG_INTERRUPT_NUMBER, INTERRUPT_NUMBER);
-	temp = ReadPktPageReg(PKTPG_BUS_CTL) | BUS_CTL_ENABLE_IRQ;
+	temp = ReadPktPageReg(PKTPG_BUS_CTL) ;
+	temp |=BUS_CTL_ENABLE_IRQ;
 	WritePktPageReg(PKTPG_BUS_CTL, temp);
-	temp = ReadPktPageReg(PKTPG_LINE_CTL) | LINE_CTL_RX_ON | LINE_CTL_TX_ON;
+	temp = ReadPktPageReg(PKTPG_LINE_CTL);
+	temp|=LINE_CTL_RX_ON;
+	temp|=LINE_CTL_TX_ON;
 	WritePktPageReg(PKTPG_LINE_CTL,temp);
 }
 
@@ -166,9 +168,13 @@ void TransmitPacket(u_char *buffer,u_short len)
 		if (data & BUS_ST_RDY_4_TX_NOW) break;
 		else ++event;
 		
-		if (event>100) return;
+		if (event>100) 
+		{
+			//printf("transmit error\n\r");
+			return;
+		}
 	}
-	
+	//printf("start transmit packet\n\r");
 	ptr=(u_short *)buffer;
 	//transmit packet 2 bytes a round
 	while (len>0)
@@ -182,16 +188,18 @@ void TransmitPacket(u_char *buffer,u_short len)
 
 int ReceivePacket(char *buffer)
 {
-	u_short len,pktlen,temp,*ptr;
+	u_short len=0,pktlen,temp=0,*ptr;
 	
 	temp=IOREAD(IODATA0);//discard RxStatus
 	len=IOREAD(IODATA0);//read frame length
+	
 	pktlen=len;
 	ptr=(u_short *)buffer;
 	
 	while (len>0)
 	{
 		temp=IOREAD(IODATA0);
+		//printf("packet data:0x%08lx\n\r",temp);
 		if (len==1)
 		{
 			*((char *)ptr)=(char)temp;
@@ -242,17 +250,28 @@ void RxPacketStatus()
 	u_short event;
 	
 	event = IOREAD(ISQ);
-	//while (event = IOREAD(ISQ))
+	
 	do
 	{
-	
-		if ( ((event & ISQ_REG_NUM   )    == REG_NUM_RX_EVENT ) &&
+		if ((event & ISQ_REG_NUM)==REG_NUM_RX_EVENT)
+		{
+			if ((event & RX_EVENT_RX_OK)    == RX_EVENT_RX_OK   )
+			{
+				if (((event & RX_EVENT_IND_ADDR) | (event & RX_CTL_BROADCAST_A))) 
+				{
+					RecvRoutine();
+				}
+			}
+		}else printf("rx error\n\r");
+		
+		
+		/*if ( ((event & ISQ_REG_NUM   )    == REG_NUM_RX_EVENT ) &&
 	   	((event & RX_EVENT_RX_OK)    == RX_EVENT_RX_OK   ) &&
 	   	((event & RX_EVENT_IND_ADDR) | (event & RX_CTL_BROADCAST_A))) 
 			{
 				RecvRoutine();
 			}
-		//else printf("rx error\n\r");
+		else printf("rx error\n\r");*/
 		event = IOREAD(ISQ);	
 	}while (event);//read all the interrupt event,or we will never recv any interrupt from CS8900a
 }

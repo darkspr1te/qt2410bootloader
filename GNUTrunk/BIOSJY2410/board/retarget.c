@@ -25,11 +25,9 @@ extern int ReadComPort(char *data, int len);
 extern int WriteComPort(char *data, int len);
 
 
-int _read (int file, char *ptr, int len)
+/*int _read (int file, char *ptr, int len)
 {
-	/* GetChar : Your implementation to receive the character 
-	from the serial port.*/
-  //*ptr=GetChar();  
+	
   *ptr=getch();
   return (1);
 }
@@ -37,15 +35,14 @@ int _read (int file, char *ptr, int len)
 int _write(int file,char *ptr,int len)
 {
 	int i;
-  /* PutChar : Your implementation to send the character to the 
-  serial port.*/
+  
   for(i=0;i<len;i++)
   {      
   	//PutChar(*ptr++);
   	WriteComPort(*ptr++, 1);
   } 
   return len;
-}
+}*/     
 
 int MyPutC(int ch)
 {

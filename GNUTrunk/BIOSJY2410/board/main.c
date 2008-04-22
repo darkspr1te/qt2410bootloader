@@ -93,8 +93,8 @@ void WriteSystemInfo()
 	printf("7. Set Other Kernel Image Start\n\r");
 	printf("8. Set Other Kernel Image Size\n\r");
 	printf("9. Set Application Load Address\n\r");
-	printf("10. Set Linux Boot parameters\n\r");
-	printf("11. Set boot option\n\r");
+	printf("A. Set Linux Boot parameters\n\r");
+	printf("B. Set boot option\n\r");
 	printf("Your Choice:");
 	//scanf("%d",&ret);
 	ret=getch();
@@ -194,7 +194,7 @@ void WriteSystemInfo()
 		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
-	else if (ret=='10')
+	else if (ret=='A')
 	{
 		printf("Set Linux Boot Parameters:"); 
 		//scanf("%s",sysInfo->BootParam);
@@ -218,7 +218,7 @@ void WriteSystemInfo()
 		memcpy(GlobalSysBuffer,buffer,512);
 		WritePage(address,buffer);
 	}
-	else if (ret=='11')
+	else if (ret=='B')
 	{
 		printf("Auto loading linux or other kernel(Linux:1 Other Kernel:2 NoAutoBoot:3):"); 
 		//scanf("%d",&sysInfo->BootOption);
@@ -441,10 +441,9 @@ int main(void)
  	
  	//relocate vector
  	memcpy(VectDest,_vector,0x1000);
- 	heap_init();
  	PortInit();
  	CleanMMUTable();
- 	mmu_tlb_init();
+  mmu_tlb_init();
  	MyMMUBase=MMU_TABLE_BASE;//MMU_TABLE_BASE+SIZE_64M;
  	StartMMU(MyMMUBase);
 
@@ -460,7 +459,7 @@ int main(void)
  	InitEthernet();
  	//initial USB
  	usbInit();
- 
+  
  	
  	Delay(100);
  	

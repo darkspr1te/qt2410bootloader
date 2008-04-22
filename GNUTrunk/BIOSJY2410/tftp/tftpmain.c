@@ -71,7 +71,7 @@ int StartTFTPServer()
 	}
 
 	if(TftpLoadEnd) {
-		printf("\n\rdownload 0x%x bytes to 0x%08x\n\r", tftp_download_len, tftp_download_addr);
+		printf("\n\rdownload 0x%08xx bytes to 0x%08x\n\r", tftp_download_len, tftp_download_addr);
 //		printf("\nPress any key to continue...\n");
 //		getch();
 		startTFTP=false;
