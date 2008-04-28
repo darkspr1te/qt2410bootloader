@@ -56,7 +56,7 @@ CLIBS = $(LIBPATH) -lc -lgcc
 CINCFLAG=-I$(BOARD) -I$(DRIVERS) -I$(UTILITY) -I$(TFTP) -I$(ARMINC)
 #CFLAGS=-marm -gdwarf  $(CINCFLAG)
 CFLAGS=-fno-builtin -nostdlib -nostdinc -c -g $(CINCFLAG)
-AFLAGS=-EL 
+AFLAGS=-g -EL 
 LDFLAGS=-Tbootloader.lds
 OBJCOPYFLAGS = -R .comment -R .stab -R .stabstr
 
