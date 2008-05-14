@@ -277,6 +277,7 @@ void JumpToProgram()
 		bic	ip, ip, #0x0001			/* disable MMU */
 		mcr	p15, 0, ip, c1, c0, 0	/* write control register */
 	}
+	//CS8900Halt();
 	Delay(100);
 	(*fp)(0,193,0x30000100);//193 is the linux machine type of 2410
 	return;

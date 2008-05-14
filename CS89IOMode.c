@@ -270,4 +270,8 @@ int board_eth_get_addr(unsigned char *addr)
 	return 0;
 }
 
+void CS8900Halt()
+{
+	WritePktPageReg(PKTPG_LINE_CTL,0);
+}
 

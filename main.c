@@ -430,6 +430,9 @@ int main(void)
  	InitEthernet();
  	//initial USB
  	usbInit();
+ 	//lcd test
+ 	LCDInit();
+ 	lcdplay();
  	Delay(100);
  	
  	

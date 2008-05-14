@@ -1,4 +1,4 @@
-BOOTFromNAND EQU 1  ;0 means you boot from ice
+BOOTFromNAND EQU 0  ;0 means you boot from ice
 BIT_SELFREFRESH EQU	(1<<22)
 
 ;stack base address
