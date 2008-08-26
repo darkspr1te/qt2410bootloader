@@ -154,6 +154,7 @@ void TransmitPacket(u_char *buffer,u_short len)
 {
 	int event=0,i;
 	u_short data,*ptr;
+	u_char tmp;
 	
 	
 	//write TxCMD register
@@ -182,6 +183,12 @@ void TransmitPacket(u_char *buffer,u_short len)
 		IOWRITE(IODATA0, *ptr);
 		len-=2;
 		++ptr;
+		if (len==1)
+		{
+			tmp=*((char *)ptr);
+			IOWRITE(IODATA0, tmp);
+			break;
+		}
 	}
 	//printf("Transmit packet success\n\r");
 }
